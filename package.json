@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/lab": "^7.0.1-beta.19",
@@ -17,6 +18,7 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "lucide-react": "^0.553.0",
+    "multer": "^2.0.2",
     "mysql2": "^3.15.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

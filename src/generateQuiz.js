@@ -1,8 +1,16 @@
 import express from "express";
-import fetch from "node-fetch";
+import fs from "fs";
+import multer from "multer";
+import Anthropic from "@anthropic-ai/sdk";
 
 const router = express.Router();
-router.post("/generateQuiz", async (resizeBy, res) => {
+const upload = multer({ dest: "uploads/" });
+
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY
+});
+
+router.post("/generateQuiz", upload.single("file"), async (req, res) => {
     const {material,numQ} = req.body;
     const prompt = `
     You are an educator. Create a quiz according to the given course material. 
@@ -28,28 +36,27 @@ router.post("/generateQuiz", async (resizeBy, res) => {
     course material: ${material}`;
 
     try{
-        const anthropic = await fetch("https://api.anthropic.com/v1/messages",{
-            method: "POST",
-            headers: {
-                "api-key": process.env.Anthropic_API_key,
-                "type": "application/json"
-            },
-            body: JSON.stringify({
-                model: "claude-3-5-sonnet-latest",
-                max_tokens: 4000,
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ]
-            })
-        })
-
-        const data = await anthropicRes.json();
-
-        const quiz = JSON.parse(data.content[0].text);
-        res.json({success: true, quiz});
+        const fileBuffer = FSWatcher.readFileSync("./slides.pdf");
+        const response = await client.messages.create({
+            model: "claude-3-5-sonnet-latest",
+            max_tokens: 4000,
+            messages: [
+                {
+                    role: "user",
+                    content: [
+                        {
+                            type: "input_file",
+                            media_type: "application/pdf",
+                            data: fileBuffer.toString("base64")
+                        },
+                        {
+                            type: "text",
+                            text: prompt
+                        }
+                    ]
+                }
+            ]
+        });
     } catch (error) {
         return res.status(500).json({ error: "Failed to generate quiz" });
     }

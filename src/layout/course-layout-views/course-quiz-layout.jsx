@@ -62,15 +62,26 @@ export default function QuizView(){
 }
 
 function NewQuizForm({ onClose }){
-  const [numQuestions, setNumQuestions] = useState(5);
+  const [numQuestions, setNumQuestions] = useState(0);
+  const [file, setFile] = useState(null);
 
-  const generateQuiz = (e) => {
-    if(!referenceFile){
+  const generateQuiz = async (e) => {
+    e.preventDefault();
+    if(!file){
       e.preventDefault(); 
-      alert("generate a quiz");
+      alert("You did not select a file");
       onClose(); 
+    }else{
+      setLoading(true);
+      const quiz = await generateQuiz(file,numQuestions);
+      if(quiz.success){
+        setQuiz(data.quiz);
+      }else{
+        alert("Failed to generate quiz: " + quiz.error);
+      }
+      setLoading(false);
     }
-  }
+  };
   
   return(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -78,7 +89,7 @@ function NewQuizForm({ onClose }){
         <form onSubmit={generateQuiz}>
           <h2 className="text-xl font-semibold mb-4 text-gray-800">Make a New Quiz</h2>
           <p className="text-l font-semibold mb-4 text-black">Reference File:</p>
-          <input type="file" className="w-full text-black bg-white border border-gray-300 rounded p-2 appearance-none file:bg-blue-600 file:text-white file:border-0 file:rounded file:px-3 file:py-1 hover:file:bg-blue-700 mb-4"></input>
+          <input type="file" onChange={(e) => setFile(e.target.value)} className="w-full text-black bg-white border border-gray-300 rounded p-2 appearance-none file:bg-blue-600 file:text-white file:border-0 file:rounded file:px-3 file:py-1 hover:file:bg-blue-700 mb-4"></input>
           <p className="text-l font-semibold mb-2 text-black">Number of Question: {numQuestions}</p>
           <div className="mb-4">
             <input type="range" min="1" max="10" value={numQuestions} onChange={(e) => setNumQuestions(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
@@ -99,4 +110,22 @@ function NewQuizForm({ onClose }){
       </div>
     </div>
   );
+}
+
+async function generateQuiz(file , numQuestions){
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("numQ", numQuestions);
+
+  try {
+    const res = await fetch("http://localhost:3000/generateQuiz", {
+      method: "POST",
+      body: formData,
+    });
+
+    return await res.json(); 
+  } catch (err) {
+    console.error("Error:", err);
+    throw err;
+  }
 }
