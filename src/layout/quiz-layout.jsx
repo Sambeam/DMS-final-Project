@@ -52,9 +52,12 @@ function Quiz (){
         }
     ];
 
+    //define display type(quiz or review)//
     useEffect(() => {
         setDisplayType(location.state?.displayType);
-    });  //takes question that belong to the quiz//
+    });  
+    
+    //takes question that belong to the quiz//
     useEffect(() => {
         const selectedQuestion = [];
         for (const q of questions) {
@@ -88,7 +91,9 @@ function Quiz (){
             ? { ...q, grade: grade }
             : q
         );
+
         localStorage.setItem("quizes",JSON.stringify(new_quizzes));
+        localStorage.setItem("questions",JSON.stringify(quizQuestion))
         localStorage.setItem("returnToCourseLayout", "true");
         
         //navigate back to main app//
@@ -154,7 +159,7 @@ function QuizComponent({ quizQuestion, handleSubmit, handleAnswerChange }) {
                     </div>
                 </div>
             ))}
-            <button type="submit" onClick={() => handleSubmit(e)}
+            <button type="submit" onClick={(e) => handleSubmit(e)}
             className="flex flex-col items-center bg-blue-800 w-[80%] hover:bg-blue-500">Submit</button>
         </form>
     );

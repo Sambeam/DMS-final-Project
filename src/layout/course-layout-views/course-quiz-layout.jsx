@@ -1,41 +1,25 @@
-//This page display all user created practice quizes. User should be able to click on each quiz and view their answer.
+//This page display all user created practice quizzes. User should be able to click on each quiz and view their answer.
 //They should also be able to feed the system a course material and generate a new practice quiz. For any quiz without a grade
 //(not compelted), the system would navigate user to the quiz-layout page where all the ai-generated question would be displayed
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AddButton from "../../assets/AddButton.png";
+import { useEffect } from "react";
+
 
 export default function QuizView({ course }){
   //the state to describe the visibility of the quiz generating form//
   const [newQuiz, setNewQuizForm] = useState(false);
+  const [quizzes, setQuizzes] = useState([]);
   const navigate = useNavigate();
   //test entries for quizzes//
-    const quizzes = [
-    {
-      quiz_id: 1,
-      quiz_name: "Database Fundamentals Quiz",
-      date: "2025-11-25",
-      grade: 88,
-    },
-    {
-      quiz_id: 2,
-      quiz_name: "SQL Query Practice",
-      date: "2025-12-02",
-      grade: 94,
-    },
-    {
-      quiz_id: 3,
-      quiz_name: "Normalization and Keys",
-      date: "2025-12-10",
-      grade: 79,
-    },
-    {
-      quiz_id: 4,
-      quiz_name: "NoSQL",
-      date: "2025-12-14",
-      grade: "",
-    },
-  ];
+  useEffect(() => {
+    let allQuizzes = []
+    const storedQuizzes = localStorage.getItem("quizes");
+    allQuizzes = JSON.parse(storedQuizzes);
+    let courseQuizzes = allQuizzes.filter((q)=> String(q.course_id) == String(course.course_id));
+    setQuizzes(courseQuizzes);
+  },[course]);
 
   //handle the event of user clicking quiz block(graded or not)//
   const openQuiz = (quiz) => {
