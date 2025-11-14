@@ -2,7 +2,6 @@ import React, {useEffect,useState} from "react";
  
 export default function AssignmentView({courseID}){
     const [assignments, setAssignments] = useState([]); //state to control assignment in the page//
-
     //testing entries//
     useEffect(() => {
         const mockAssignment = [
@@ -48,5 +47,6 @@ export default function AssignmentView({courseID}){
                 ))}
             </div>
         </div>
+        
     );
 }

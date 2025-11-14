@@ -58,7 +58,7 @@ function CustomTab({course}) {
                 <AssignmentView courseID={course.course_id} />
             </TabPanel>
             <TabPanel value="2">
-                <GradeView />
+                <GradeView course={course}/>
             </TabPanel>
             <TabPanel value="3">
                 <QuizView course={course} />
