@@ -33,6 +33,15 @@ function CustomTab({course}) {
     setValue(newValue);
   };
 
+  // Restore to Practice Quiz tab when returning from quiz
+  useEffect(() => {
+    const savedTab = localStorage.getItem("courseLayoutTab");
+    if (savedTab) {
+      setValue(savedTab);
+      localStorage.removeItem("courseLayoutTab");
+    }
+  }, []);
+
   return (
     <div className="mt-4 -screen">
         {/* https://mui.com/material-ui/react-tabs/ */}
@@ -46,13 +55,13 @@ function CustomTab({course}) {
                 </TabList>
             </Box>
             <TabPanel value="1">
-                <AssignmentView courseID={course.course_id} />
+                <AssignmentView course={course} />
             </TabPanel>
             <TabPanel value="2">
-                <GradeView />
+                <GradeView course={course}/>
             </TabPanel>
             <TabPanel value="3">
-                <QuizView />
+                <QuizView course={course} />
             </TabPanel>
             <TabPanel value="4">
                     <ResourceView />
@@ -72,5 +81,4 @@ export default function CourseLayout({course}) {
         </div>
     )
 }
-
 

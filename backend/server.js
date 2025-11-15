@@ -1,12 +1,29 @@
-/*import express from "express";
-import mysql from "mysql2";
-import cors from "cors";
+import express from "express";
+import dotenv from "dotenv";
+import connectDB from "./db.js";   
+import userRoutes from "./routes/userRoutes.js";
+
+dotenv.config();
 
 const app = express();
-app.use(cors());
 app.use(express.json());
 
-const database = mysql.createConnection({
+connectDB();
+
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+//model routes//
+app.use("/api/users", userRoutes);
+
+/*const database = mysql.createConnection({
     host: "localhost", user: "root", password: "", database: "datamanagementproject"
 });
 
@@ -36,9 +53,6 @@ app.get("/api/course_work/:course_id", (request,result)=>{
         if(err) return result.status(500).json(err);
         result.json(results);
     });
-});
+});*/
 
 //starting server//
-app.listen(3000, ()=>{
-    console.log("started running server on http://localhost:3000")
-});*/
