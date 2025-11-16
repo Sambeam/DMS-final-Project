@@ -1,27 +1,28 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db.js";   
-import userRoutes from "./routes/userRoutes.js";
+import apiRoutes from "./routes/Routes.js";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 connectDB();
 
 app.get("/", (req, res) => {
-  res.send("Backend is running!");
+  res.send("Backend is running");
 });
+
+//model routes//
+app.use("/api", apiRoutes);
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
-//model routes//
-app.use("/api/users", userRoutes);
 
 /*const database = mysql.createConnection({
     host: "localhost", user: "root", password: "", database: "datamanagementproject"
