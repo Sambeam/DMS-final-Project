@@ -108,3 +108,14 @@ const performancestatSchema = new mongoose.Schema({
     record_time: {type: Date, required: true}
 });
 export const Performance_Stat = mongoose.model("Performance_Stat", performancestatSchema);
+
+const holidaySchema = new mongoose.Schema({
+    country_code: { type: String, required:true},
+    year: {type: Number, required: true},
+    date: {type: Date, required: true},
+    local_name: String,
+    name: String,
+    type: String,
+}, {timestamps: true});
+holidaySchema.index({country_code: 1, year: 1, date: 1}, {unique: true});
+export const Holiday  = mongoose.model("Holiday", holidaySchema);

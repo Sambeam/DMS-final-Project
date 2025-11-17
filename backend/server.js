@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db.js";   
 import apiRoutes from "./routes/ModelRoutes.js";
+import ExportRoutes from "./routes/export.js";
 import {User} from "./models/models.js";
 import cors from "cors";
 
@@ -34,6 +35,9 @@ app.get("/api/test-mongo", async (req, res) => {
 
 //model routes//
 app.use("/api", apiRoutes);
+
+//XML export routes//
+app.use("/api/export", ExportRoutes);
 
 const PORT = process.env.PORT || 3000;
 
