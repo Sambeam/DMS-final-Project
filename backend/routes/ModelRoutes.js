@@ -2,55 +2,56 @@ import express from "express";
 import * as controllers from "../controllers/ModelController.js";
 import axios from "axios";
 import { Holiday } from "../models/models.js"
+import {validate} from "../DataValidation/ValidateEntry.js";
+import { validateParams } from "../DataValidation/ValidateEntry.js";
+import { validateQuery } from "../DataValidation/ValidateEntry.js";
+import * as Schemas from "../DataValidation/ModelValidation.js"
 
 const router = express.Router();
 
-router.post("/users", controllers.createUser);
+router.post("/users", validate(Schemas.UserSchema),controllers.createUser);
 router.get("/users", controllers.getUsers);
 
-router.post("/courses", controllers.createCourse);
-router.get("/courses/:userId", controllers.getCoursesByUser);
+router.post("/courses", validate(Schemas.CourseSchema),controllers.createCourse);
+router.get("/courses/:userId", validateParams(Schemas.makeIdSchema("userId")),controllers.getCoursesByUser);
 
-router.post("/coursework", controllers.createCourseWork);
+router.post("/coursework", validate(Schemas.CourseWorkSchema),controllers.createCourseWork);
 router.get("/coursework/:courseId", controllers.getCourseWorkByCourse);
 
-router.post("/quizzes", controllers.createQuiz);
+router.post("/quizzes", validate(Schemas.QuizSchema),controllers.createQuiz);
 router.get("/quizzes/:courseId", controllers.getQuizzesByCourse);
 
-router.post("/questions", controllers.createQuestion);
+router.post("/questions", validate(Schemas.QuestionSchema),controllers.createQuestion);
 router.get("/questions/:quizId", controllers.getQuestionsByQuiz);
 
-router.post("/resources", controllers.createResource);
+router.post("/resources", validate(Schemas.ResourceSchema),controllers.createResource);
 router.get("/resources/:courseId", controllers.getResourcesByCourse);
 
-router.post("/events", controllers.createEvent);
+router.post("/events", validate(Schemas.CalendarEventSchema),controllers.createEvent);
 router.get("/events/:userId", controllers.getEventsByUser);
 
-router.post("/studysections", controllers.createStudySection);
+router.post("/studysections", validate(Schemas.StudySectionSchema),controllers.createStudySection);
 router.get("/studysections/:userId", controllers.getStudySections);
 
-router.post("/studynotes", controllers.createStudyNote);
+router.post("/studynotes", validate(Schemas.StudyNoteSchema),controllers.createStudyNote);
 router.get("/studynotes/:courseId", controllers.getStudyNotesByCourse);
 
-router.post("/notepages", controllers.createNotePage);
+router.post("/notepages", validate(Schemas.NotePageSchema),controllers.createNotePage);
 router.get("/notepages/:noteId", controllers.getPagesByNote);
 
-router.post("/eventtags", controllers.createEventTag);
+router.post("/eventtags", validate(Schemas.EventTagSchema),controllers.createEventTag);
 router.get("/eventtags/:eventId", controllers.getTagsByEvent);
 
-router.post("/aiqueries", controllers.createAIQuery);
+router.post("/aiqueries", validate(Schemas.AIQuerySchema),controllers.createAIQuery);
 router.get("/aiqueries/:userId", controllers.getAIQueries);
 
-router.post("/performancestats", controllers.createPerformanceStat);
+router.post("/performancestats", validate(Schemas.PerformanceStatSchema),controllers.createPerformanceStat);
 router.get("/performancestats/:userId", controllers.getPerformanceStats);
 
 //for holiday//
-router.post("/sync", async (req ,res)=>{
+router.post("/sync",validate(Schemas.HolidaySchema), async (req ,res)=>{
     try{
         const {year,countryCode} = req.body;
-        if(!year||!countryCode){
-            return res.status(400).json({error: "year and country code required"});
-        }
 
         //retrieving list of holiday from nager//
         const nager_url = `https://date.nager.at/api/v3/publicholidays/${year}/${countryCode}`;
@@ -89,7 +90,7 @@ router.post("/sync", async (req ,res)=>{
     }
 });
 
-router.get("/holidays", async(req,res)=>{
+router.get("/holidays", validateQuery(Schemas.HolidayQuerySchema),async(req,res)=>{
     try{
         const {year, countryCode = "CA"} = req.query;
         if(!year){
