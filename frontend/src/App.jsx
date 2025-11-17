@@ -625,6 +625,45 @@ END:VCALENDAR`.replace(/\n/g, "\r\n");
     const timeSlots = ["8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM"];
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
+    //states for holiday display//
+    const [year, setYear] = useState(new Date().getFullYear());
+    const [holidays, setHolidays] = useState([]);
+
+    //load holiday from database//
+    const dbHolidays = async () =>{
+      const res = await fetch(`http://localhost:3000/api/holidays?year=${year}`);
+      const data = await res.json();
+      setHolidays(data.holidays || []);
+    };
+
+    //sync holiday data from Nager with DB holiday schema//
+    const syncHolidays = async() =>{
+      const res = await fetch("http://localhost:3000/api/holidays/sync",{
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({year,counteryCode:"CA"}),
+      });
+      const holiday_sync_data = await res.json();
+    };
+
+    //auto sync holiday//
+    useEffect(() =>{
+      const autoSync = async() =>{
+        try{
+          await syncHolidays();
+          await dbHolidays();
+        }catch(error){
+          console.error("Holiday sync failed");
+        }
+      }
+      autoSync();
+    }, [year]);
+
+    const changeDateToWeekDay = (dateString) =>{
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", { weekday: "long" });
+    };
+
     const getClassesForDay = (day) => classes.filter((c) => c.dayOfWeek === day);
     const to24h = (label) => {
       const map = {
@@ -643,6 +682,8 @@ END:VCALENDAR`.replace(/\n/g, "\r\n");
 
     return (
       <div className="max-w-7xl mx-auto">
+         <div className="mt-4 mb-6 flex gap-3 items-center">
+      </div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-1">Weekly Timetable</h2>
@@ -677,11 +718,23 @@ END:VCALENDAR`.replace(/\n/g, "\r\n");
               <thead>
                 <tr>
                   <th className="border border-gray-200 bg-gray-50 p-3 text-left font-semibold text-gray-700">Time</th>
-                  {days.map((day) => (
-                    <th key={day} className="border border-gray-200 bg-gray-50 p-3 text-left font-semibold text-gray-700">
-                      {day}
+                  {days.map((day) => {
+                    const holidayToday = holidays.find((h) => getWeekdayName(h.date) === day);
+
+                  return (
+                    <th
+                      key={day}
+                      className="border border-gray-200 bg-gray-50 p-3 text-left font-semibold text-gray-700"
+                    >
+                      <div>{day}</div>
+                        {holidayToday && (
+                          <div className="text-red-600 text-xs font-semibold mt-1">
+                            🎉 {holidayToday.local_name || holidayToday.name}
+                          </div>
+                        )}
                     </th>
-                  ))}
+                  );
+                  })}
                 </tr>
               </thead>
               <tbody>
