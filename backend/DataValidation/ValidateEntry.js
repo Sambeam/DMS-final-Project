@@ -1,7 +1,7 @@
 import {ZodError} from "zod";
 
 //to validate url params//
-export const validateParams = (schema) => (res,req,next) =>{
+export const validateParams = (schema) => (req,res,next) =>{
     try{
         req.params = schema.parse(req.params);
         next();
@@ -10,7 +10,7 @@ export const validateParams = (schema) => (res,req,next) =>{
     }
 };
 
-export const validateQuery = (schema) => (res,req,next) =>{
+export const validateQuery = (schema) => (req,res,next) =>{
     try{
         req.query = schema.parse(req.query);
         next();
@@ -19,7 +19,7 @@ export const validateQuery = (schema) => (res,req,next) =>{
     }
 };
 
-export const validate = (schema) => (res,req,next)=>{
+export const validate = (schema) => (req,res,next)=>{
     try{
         req.body = schema.parse(req.body);
         next();

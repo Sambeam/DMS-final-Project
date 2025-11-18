@@ -7,13 +7,72 @@ import { validateParams } from "../DataValidation/ValidateEntry.js";
 import { validateQuery } from "../DataValidation/ValidateEntry.js";
 import * as Schemas from "../DataValidation/ModelValidation.js"
 
+
 const router = express.Router();
 
-router.post("/users", validate(Schemas.UserSchema),controllers.createUser);
-router.get("/users", controllers.getUsers);
+const models = ["user", "course","coursework","quiz","question","resource","event","eventtag","studysection", "studynote","notepage","aiquery","performancestat"];
 
-router.post("/courses", validate(Schemas.CourseSchema),controllers.createCourse);
-router.get("/courses/:userId", validateParams(Schemas.makeIdSchema("userId")),controllers.getCoursesByUser);
+const zod_schemas = {
+    user: Schemas.UserSchema,
+    course: Schemas.CourseSchema,
+    coursework: Schemas.CourseWorkSchema,
+    quiz: Schemas.QuizSchema,
+    question: Schemas.QuestionSchema,
+    resource: Schemas.ResourceSchema,
+    event: Schemas.CalendarEventSchema,
+    studysection: Schemas.StudySectionSchema,
+    studynote: Schemas.StudyNoteSchema,
+    notepage: Schemas.NotePageSchema,
+    eventtag: Schemas.EventTagSchema,
+    aiquery: Schemas.AIQuerySchema,
+    performance: Schemas.PerformanceStatSchema,
+    holiday: Schemas.HolidaySchema,
+};
+
+const create_controllers = {
+    user: controllers.createUser,
+    course: controllers.createCourse,
+    coursework: controllers.createCoursework,
+    quiz: controllers.createQuiz,
+    question: controllers.createQuestion,
+    resource: controllers.createResource,
+    event: controllers.createEvent,
+    eventtag: controllers.createEventTag,
+    studysection: controllers.createStudySection,
+    studynote: controllers.createStudyNote,
+    notepage: controllers.createNotePage,
+    aiquery: controllers.createAIQuery,
+    performance: controllers.createPerformanceStat,
+    holiday: controllers.createHoliday,
+};
+
+const get_controllers = {
+    user: controllers.getUsers,
+    course: controllers.getCourses,
+    coursework: controllers.getCoursework,
+    quiz: controllers.getQuizzes,
+    question: controllers.getQuestions,
+    resource: controllers.getResources,
+    event: controllers.getEvents,
+    studysection: controllers.getStudySections,
+    studynote: controllers.getStudyNotes,
+    notepage: controllers.getNotePages,
+    eventtag: controllers.getEventTags,
+    aiquery: controllers.getAIQueries,
+    performance: controllers.getPerformanceStats,
+    holiday: controllers.getHolidays,
+};
+
+for (const m of models){
+    router.post(`/${m}`, validate(zod_schemas[m]), create_controllers[m]);
+    router.get(`/${m}/:${m}Id`, get_controllers[m]);
+}
+
+router.post("/user", validate(Schemas.UserSchema),controllers.createUser);
+router.get("/user/:userId", controllers.getUsers);
+
+router.post("/course", validate(Schemas.CourseSchema),controllers.createCourse);
+router.get("/course/:userId", validateParams(Schemas.makeIdSchema("userId")),controllers.getCoursesByUser);
 
 router.post("/coursework", validate(Schemas.CourseWorkSchema),controllers.createCourseWork);
 router.get("/coursework/:courseId", controllers.getCourseWorkByCourse);
@@ -109,5 +168,9 @@ router.get("/holidays", validateQuery(Schemas.HolidayQuerySchema),async(req,res)
         res.status(500).json({error: "Cannot load Holiday"});
     }
 });
+
+//added put route//
+const model_to_update = [course]
+
 
 export default router;

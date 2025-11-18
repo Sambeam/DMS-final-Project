@@ -13,7 +13,7 @@ export const CourseSchema = z.object({
     instructor: z.string().min(1),
     credit: z.number().optional(),
     semester: z.string().optional(),
-    description: z.string().optional(),
+    decsription: z.string().optional(),
     color: z.string().optional()
 });
 
@@ -44,7 +44,7 @@ export const ResourceSchema = z.object({
     resource_name: z.string().min(1),
     file_url: z.string().url(),
     type: z.string().optional(),
-    upload_time: z.date().optional
+    upload_time: z.date().optional()
 });
 
 export const CalendarEventSchema = z.object({
@@ -85,7 +85,7 @@ export const EventTagSchema = z.object({
 export const AIQuerySchema = z.object({
     user_id: z.string().min(1),
     content: z.string().min(1),
-    response: z.string().optional,
+    response: z.string().optional(),
     date: z.date()
 });
 
@@ -111,7 +111,7 @@ z.object({
     [paramName]: z.string().min(1)
 });
 
-export const HolidayQuerySchma = z.object({
+export const HolidayQuerySchema = z.object({
     year: z.string().min(4),
     countryCode: z.string().optional()
 });

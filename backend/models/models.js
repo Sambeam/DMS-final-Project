@@ -30,7 +30,8 @@ const quizSchema = new mongoose.Schema({
     course_id: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
     quiz_name: {type: String, required: true},
     date: {type: Date},
-    grade: {type: Number, default: null}
+    grade: {type: Number, default: null},
+    time: {type: TimeRanges, default: null}
 });
 export const Quiz = mongoose.model("Quiz", quizSchema);
 
