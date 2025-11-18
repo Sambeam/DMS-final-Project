@@ -9,6 +9,7 @@ export const User = mongoose.model("User", userSchema);
 
 const courseSchema = new mongoose.Schema({
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User",required: true },
+    course_code: {type: String, required: true},
     course_name: {type: String, required: true},
     instructor: {type: String, required: true},
     credit:{type: Number},

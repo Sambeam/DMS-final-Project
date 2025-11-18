@@ -11,6 +11,7 @@ import {validate} from "../DataValidation/ValidateEntry.js";
 import { validateParams } from "../DataValidation/ValidateEntry.js";
 import { validateQuery } from "../DataValidation/ValidateEntry.js";
 import * as Schemas from "../DataValidation/ModelValidation.js"
+import { loginAttempt } from "../controllers/AuthenticationController.js";
 
 
 const router = express.Router();
@@ -54,6 +55,9 @@ for (const m of models){
     router.post(`/${m}`, validate(zod_schemas[m]), create_controllers[m]);
     //router.get(`/${m}/:${m}Id`, get_controllers[m]);
 }
+
+//for login//
+router.post("/user/login", loginAttempt);
 
 //for user//
 router.get("/user", controllers.getUsers);
