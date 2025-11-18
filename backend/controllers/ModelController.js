@@ -1,18 +1,22 @@
 import * as Models from "../models/models.js";
+import bcrypt from "bcrypt";
 
 export function err_500 (res, error){
     res.status(500).json({ error: error.message });
+    console.error("CreateUser Error:", error);
 }
 
 export function err_404 (res){
     return res.status(404).json({ error: "not found" });
+    console.error("CreateUser Error:", error);
 }
 
 export const createUser = async (req, res) => {
     try {
-        //take the attribute from the register form//
-        const {username, email, pswd_hash} = req.body;
+        console.log("Creating user:", req.body); 
 
+        //take the attribute from the register form//
+        let {username, email, pswd_hash} = req.body;
         //hash the password with bcrypt//
         pswd_hash = await bcrypt.hash(pswd_hash,10);
 
@@ -25,9 +29,9 @@ export const createUser = async (req, res) => {
 
         //save the user obj//
         await newUserObj.save();
-        res.status(201).json(newUser);
+        res.status(201).json(newUserObj);
     } catch (error) {
-        err_500(res,error);
+        err_500(json);
     }
 };
 

@@ -29,6 +29,8 @@ import CourseLayout from "./layout/courselayout.jsx";
 import Quiz from "./layout/quiz-layout.jsx";
 import AuthPage from "./Authentication/AuthPage.jsx"
 import LandingPage from "./Authentication/LandingPage.jsx"
+import axios from "axios";
+
 
 const WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const SESSION_TYPES = ["lecture", "lab", "tutorial"];
@@ -119,6 +121,7 @@ const StudyHubApp = () => {
         email: authForm.email,
         pswd_hash: authForm.password
       };
+      alert("made user obj");
     }catch(error){
         setAuthError("Unexpected error, please try again.");
         return;
@@ -127,8 +130,10 @@ const StudyHubApp = () => {
     try{
       const response = await axios.post("http://localhost:3000/api/user",new_user);
       const savedUser = response.data;
+      alert("begin to set user");
       setTimeout(() => {
-      setUser(savedUSer); //set the current user as the newly registered user//
+      setUser(savedUser); //set the current user as the newly registered user//
+      alert("set user");
 
       //reset the form//
       setAuthForm({ name: "", email: "", password: "" });
@@ -136,6 +141,7 @@ const StudyHubApp = () => {
       setAuthScreen("landing");
       }, 800);
     }catch(error){
+        console.log("AXIOS ERROR:", error.response?.data || error.message);
       setAuthError("Registration failed.");
       setAuthLoading(false);
     }
