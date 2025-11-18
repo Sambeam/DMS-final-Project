@@ -9,11 +9,12 @@ export const UserSchema = z.object({
 
 export const CourseSchema = z.object({
     user_id: z.string().min(1),
+    course_code: z.string().min(1),
     course_name: z.string().min(1),
     instructor: z.string().min(1),
     credit: z.number().optional(),
     semester: z.string().optional(),
-    decsription: z.string().optional(),
+    description: z.string().optional(),
     color: z.string().optional()
 });
 
