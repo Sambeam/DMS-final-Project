@@ -31,7 +31,7 @@ const quizSchema = new mongoose.Schema({
     quiz_name: {type: String, required: true},
     date: {type: Date},
     grade: {type: Number, default: null},
-    time: {type: TimeRanges, default: null}
+    time: {type: Date, default: null}
 });
 export const Quiz = mongoose.model("Quiz", quizSchema);
 

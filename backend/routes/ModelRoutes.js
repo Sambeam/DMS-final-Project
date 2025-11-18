@@ -1,5 +1,10 @@
+/*
+this script add routes manage schema in database (create, get, delete and put)
+*/
 import express from "express";
 import * as controllers from "../controllers/ModelController.js";
+import * as updateControllers from "../controllers/PutControllers.js";
+import * as deleteControllers from "../controllers/DeleteControllers.js";
 import axios from "axios";
 import { Holiday } from "../models/models.js"
 import {validate} from "../DataValidation/ValidateEntry.js";
@@ -25,14 +30,14 @@ const zod_schemas = {
     notepage: Schemas.NotePageSchema,
     eventtag: Schemas.EventTagSchema,
     aiquery: Schemas.AIQuerySchema,
-    performance: Schemas.PerformanceStatSchema,
+    performancestat: Schemas.PerformanceStatSchema,
     holiday: Schemas.HolidaySchema,
 };
 
 const create_controllers = {
     user: controllers.createUser,
     course: controllers.createCourse,
-    coursework: controllers.createCoursework,
+    coursework: controllers.createCourseWork,
     quiz: controllers.createQuiz,
     question: controllers.createQuestion,
     resource: controllers.createResource,
@@ -42,70 +47,62 @@ const create_controllers = {
     studynote: controllers.createStudyNote,
     notepage: controllers.createNotePage,
     aiquery: controllers.createAIQuery,
-    performance: controllers.createPerformanceStat,
-    holiday: controllers.createHoliday,
-};
-
-const get_controllers = {
-    user: controllers.getUsers,
-    course: controllers.getCourses,
-    coursework: controllers.getCoursework,
-    quiz: controllers.getQuizzes,
-    question: controllers.getQuestions,
-    resource: controllers.getResources,
-    event: controllers.getEvents,
-    studysection: controllers.getStudySections,
-    studynote: controllers.getStudyNotes,
-    notepage: controllers.getNotePages,
-    eventtag: controllers.getEventTags,
-    aiquery: controllers.getAIQueries,
-    performance: controllers.getPerformanceStats,
-    holiday: controllers.getHolidays,
+    performancestat: controllers.createPerformanceStat
 };
 
 for (const m of models){
     router.post(`/${m}`, validate(zod_schemas[m]), create_controllers[m]);
-    router.get(`/${m}/:${m}Id`, get_controllers[m]);
+    //router.get(`/${m}/:${m}Id`, get_controllers[m]);
 }
 
-router.post("/user", validate(Schemas.UserSchema),controllers.createUser);
-router.get("/user/:userId", controllers.getUsers);
+//for user//
+router.get("/user", controllers.getUsers);
+router.get("/user/:userId", validateParams(Schemas.makeIdSchema("userId")), controllers.getUsersById);
 
-router.post("/course", validate(Schemas.CourseSchema),controllers.createCourse);
-router.get("/course/:userId", validateParams(Schemas.makeIdSchema("userId")),controllers.getCoursesByUser);
+//for course//
+router.get("/course/user/:userId", validateParams(Schemas.makeIdSchema("userId")), controllers.getCoursesByUser);
+router.get("/course/:courseId", validateParams(Schemas.makeIdSchema("courseId")), controllers.getCoursesById);
 
-router.post("/coursework", validate(Schemas.CourseWorkSchema),controllers.createCourseWork);
-router.get("/coursework/:courseId", controllers.getCourseWorkByCourse);
+//for course work//
+router.get("/coursework/course/:courseId", validateParams(Schemas.makeIdSchema("courseId")), controllers.getCourseWorkByCourse);
+router.get("/coursework/grade", validateQuery(Schemas.HolidayQuerySchema), controllers.getCourseWorkByGrade);
 
-router.post("/quizzes", validate(Schemas.QuizSchema),controllers.createQuiz);
-router.get("/quizzes/:courseId", controllers.getQuizzesByCourse);
+//for quiz//
+router.get("/quiz/course/:courseId", validateParams(Schemas.makeIdSchema("courseId")), controllers.getQuizzesByCourse);
+router.get("/quiz/id/:quizId", validateParams(Schemas.makeIdSchema("quizId")), controllers.getQuizById);
+router.get("/quiz/date/:date", validateParams(Schemas.makeIdSchema("date")), controllers.getQuizByDate);
 
-router.post("/questions", validate(Schemas.QuestionSchema),controllers.createQuestion);
-router.get("/questions/:quizId", controllers.getQuestionsByQuiz);
+//for question//
+router.get("/question/quiz/:quizId", validateParams(Schemas.makeIdSchema("quizId")), controllers.getQuestionsByQuiz);
+router.get("/question/correct", controllers.getCorrectQuestion);
 
-router.post("/resources", validate(Schemas.ResourceSchema),controllers.createResource);
-router.get("/resources/:courseId", controllers.getResourcesByCourse);
+//for course resource//
+router.get("/resource/:resourceId", validateParams(Schemas.makeIdSchema("resourceId")), controllers.getResourceById);
+router.get("/resource/course/:courseId", validateParams(Schemas.makeIdSchema("courseId")), controllers.getResourcesByCourse);
 
-router.post("/events", validate(Schemas.CalendarEventSchema),controllers.createEvent);
-router.get("/events/:userId", controllers.getEventsByUser);
+//for event//
+router.get("/event/user/:userId", validateParams(Schemas.makeIdSchema("userId")), controllers.getEventsByUser);
+router.get("/event/type/:type", validateParams(Schemas.makeIdSchema("type")), controllers.getEventsByType);
 
-router.post("/studysections", validate(Schemas.StudySectionSchema),controllers.createStudySection);
-router.get("/studysections/:userId", controllers.getStudySections);
+//for study section//
+router.get("/studysection/user/:userId", validateParams(Schemas.makeIdSchema("userId")), controllers.getStudySections);
+router.get("/studysection/course/:courseId", validateParams(Schemas.makeIdSchema("courseId")), controllers.getStudySectionsByCourse);
 
-router.post("/studynotes", validate(Schemas.StudyNoteSchema),controllers.createStudyNote);
-router.get("/studynotes/:courseId", controllers.getStudyNotesByCourse);
+//for notes//
+router.get("/studynote/course/:courseId", validateParams(Schemas.makeIdSchema("courseId")), controllers.getStudyNotesByCourse);
+router.get("/studynote/user/:userId", validateParams(Schemas.makeIdSchema("userId")), controllers.getStudyNoteByUser);
 
-router.post("/notepages", validate(Schemas.NotePageSchema),controllers.createNotePage);
-router.get("/notepages/:noteId", controllers.getPagesByNote);
+// for pages//
+router.get("/notepage/note/:noteId", validateParams(Schemas.makeIdSchema("noteId")), controllers.getPagesByNote);
 
-router.post("/eventtags", validate(Schemas.EventTagSchema),controllers.createEventTag);
-router.get("/eventtags/:eventId", controllers.getTagsByEvent);
+//for event tag//
+router.get("/eventtag/event/:eventId", validateParams(Schemas.makeIdSchema("eventId")), controllers.getTagsByEvent);
 
-router.post("/aiqueries", validate(Schemas.AIQuerySchema),controllers.createAIQuery);
-router.get("/aiqueries/:userId", controllers.getAIQueries);
+//for ai query//
+router.get("/aiquery/user/:userId", validateParams(Schemas.makeIdSchema("userId")), controllers.getAIQueries);
 
-router.post("/performancestats", validate(Schemas.PerformanceStatSchema),controllers.createPerformanceStat);
-router.get("/performancestats/:userId", controllers.getPerformanceStats);
+//for performance stat//
+router.get("/performance/user/:userId", validateParams(Schemas.makeIdSchema("userId")), controllers.getPerformanceStats);
 
 //for holiday//
 router.post("/sync",validate(Schemas.HolidaySchema), async (req ,res)=>{
@@ -169,8 +166,61 @@ router.get("/holidays", validateQuery(Schemas.HolidayQuerySchema),async(req,res)
     }
 });
 
-//added put route//
-const model_to_update = [course]
+//added put route for selected models//
+//for course//
+router.put("/course/:courseId", validateParams(Schemas.makeIdSchema("courseId")), validate(Schemas.CourseSchema), updateControllers.updateCourse);
+
+//for course work//
+router.put("/coursework/:courseWorkId", validateParams(Schemas.makeIdSchema("courseWorkId")), validate(Schemas.CourseWorkSchema), updateControllers.updateCourseWork);
+
+//for resource//
+router.put("/resource/:resourceId", validateParams(Schemas.makeIdSchema("resourceId")), validate(Schemas.ResourceSchema), updateControllers.updateResource);
+
+//for quiz//
+router.put("/quiz/:quizId", validateParams(Schemas.makeIdSchema("quizId")), validate(Schemas.QuizSchema), updateControllers.updateQuiz);
+
+//for event//
+router.put("/event/:eventId", validateParams(Schemas.makeIdSchema("eventId")), validate(Schemas.CalendarEventSchema), updateControllers.updateEvent);
+
+//for study note//
+router.put("/studynote/:noteId", validateParams(Schemas.makeIdSchema("noteId")), validate(Schemas.StudyNoteSchema), updateControllers.updateStudyNote);
+
+//for note page//
+router.put("/notepage/:pageId", validateParams(Schemas.makeIdSchema("pageId")), validate(Schemas.NotePageSchema), updateControllers.updateNotePage);
+
+//for question//
+router.put("/question/:questionId", validateParams(Schemas.makeIdSchema("questionId")), validate(Schemas.QuestionSchema), updateControllers.updateQuestion);
+
+//for event tag//
+router.put("/eventtag/:tagId", validateParams(Schemas.makeIdSchema("tagId")), validate(Schemas.EventTagSchema), updateControllers.updateEventTag);
+
+//added delete for selected model//
+//for course//
+router.delete("/course/:courseId", validateParams(Schemas.makeIdSchema("courseId")), deleteControllers.deleteCourse);
+
+//for course work//
+router.delete("/coursework/:courseWorkId", validateParams(Schemas.makeIdSchema("courseWorkId")), deleteControllers.deleteCourseWork);
+
+//for resource//
+router.delete("/resource/:resourceId", validateParams(Schemas.makeIdSchema("resourceId")), deleteControllers.deleteResource);
+
+//for quiz//
+router.delete("/quiz/:quizId", validateParams(Schemas.makeIdSchema("quizId")), deleteControllers.deleteQuiz);
+
+//for event//
+router.delete("/event/:eventId", validateParams(Schemas.makeIdSchema("eventId")), deleteControllers.deleteEvent);
+
+//for study note//
+router.delete("/studynote/:noteId", validateParams(Schemas.makeIdSchema("noteId")), deleteControllers.deleteStudyNote);
+
+//for note page//
+router.delete("/notepage/:pageId", validateParams(Schemas.makeIdSchema("pageId")), deleteControllers.deleteNotePage);
+
+//for question//
+router.delete("/question/:questionId", validateParams(Schemas.makeIdSchema("questionId")), deleteControllers.deleteQuestion);
+
+//for event tag//
+router.delete("/eventtag/:tagId", validateParams(Schemas.makeIdSchema("tagId")), deleteControllers.deleteEventTag);
 
 
 export default router;
