@@ -1,10 +1,9 @@
 import express from "express";
 import multer from "multer";
-import fs from "fs";
 import Anthropic from "@anthropic-ai/sdk";
 
 const router = express.Router();
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
@@ -14,9 +13,7 @@ const client = new Anthropic({
 router.post("/generateQuiz", upload.single("file"), async (req, res) => {
   try {
     const { numQ } = req.body;
-    const filePath = req.file.path;
-
-    const fileBuffer = fs.readFileSync(filePath); // Read uploaded PDF
+    const fileBuffer = req.file.buffer;
 
     const prompt = `
 You are an educator. Generate a quiz using the given material.
@@ -63,8 +60,6 @@ The rules are:
     const quizJSON = JSON.parse(quizText);
 
     res.json({ success: true, quiz: quizJSON });
-
-    fs.unlinkSync(filePath); 
   } catch (error) {
     console.error(error);
     res.status(500).json({
