@@ -23,3 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Uploaded resource files
+backend/uploads/*
+!backend/uploads/.gitkeep

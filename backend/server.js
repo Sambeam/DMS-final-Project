@@ -1,8 +1,13 @@
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
+
 import express from "express";
 import dotenv from "dotenv";
-import connectDB from "./db.js";   
+import connectDB from "./db.js";
 import apiRoutes from "./routes/ModelRoutes.js";
 import ExportRoutes from "./routes/export.js";
+import UploadRoutes from "./routes/upload.js";
+import generateQuizRoutes from "./generateQuiz.js";
 import {User} from "./models/models.js";
 import cors from "cors";
 
@@ -12,6 +17,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use("/uploads", express.static("uploads"));
 
 connectDB();
 
@@ -38,6 +44,12 @@ app.use("/api", apiRoutes);
 
 //XML export routes//
 app.use("/api/export", ExportRoutes);
+
+//file upload routes//
+app.use("/api", UploadRoutes);
+
+//AI quiz generation routes//
+app.use("/api", generateQuizRoutes);
 
 const PORT = process.env.PORT || 3000;
 
