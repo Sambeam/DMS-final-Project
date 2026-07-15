@@ -31,7 +31,7 @@ export const createUser = async (req, res) => {
         await newUserObj.save();
         res.status(201).json(newUserObj);
     } catch (error) {
-        err_500(json);
+        err_500(res, error);
     }
 };
 
@@ -39,8 +39,8 @@ export const getUsers = async (req, res) => {
     try {
         const users = await Models.User.find();
         res.json(users);
-    } catch (err) {
-        err_500(res,error);    
+    } catch (error) {
+        err_500(res, error);
     }
 };
 
@@ -49,7 +49,7 @@ export const getUsersById = async (req,res)=>{
         const {userId} = req.params;
         const user = await Models.User.findById(userId);
         if(!user){
-            err_404(res);
+            return err_404(res);
         }
         res.json(user);
     }catch(error){
@@ -85,17 +85,17 @@ export const getCoursesByUser = async (req, res) => {
     try {
         const courses = await Models.Course.find({ user_id: req.params.userId });
         res.json(courses);
-    } catch (err) {
+    } catch (error) {
         err_500(res,error);
     }
 };
 
-export const getCoursesById = async (removeEventListenerq,res) =>{
+export const getCoursesById = async (req,res) =>{
     try{
         const {courseId} = req.params;
         const course = await Models.Course.findById(courseId);
         if(!course){
-            err_404(res);
+            return err_404(res);
         }
         res.json(course);
     }catch(error){
@@ -116,7 +116,7 @@ export const getCourseWorkByCourse = async (req, res) => {
     try {
         const cw = await Models.CourseWork.find({ course_id: req.params.courseId });
         res.json(cw);
-    } catch (err) {
+    } catch (error) {
         err_500(res,error);
     }
 };
@@ -127,8 +127,8 @@ export const getCourseWorkByGrade = async (req,res) =>{
         const filter = {};
 
         if(course_id) filter.course_id = course_id;
-        if(grade_gt) filter.grade = {...filter.grade, $gt: Number(grade_greater)};
-        if(grade_lt) filter.grade = { ...filter.grade, $lt: Number(grade_less)};
+        if(grade_greater) filter.cw_grade = {...filter.cw_grade, $gt: Number(grade_greater)};
+        if(grade_less) filter.cw_grade = { ...filter.cw_grade, $lt: Number(grade_less)};
 
         const coursework = await Models.CourseWork.find(filter);
         res.json(coursework);
@@ -141,7 +141,7 @@ export const createQuiz = async (req, res) => {
     try {
         const quiz = await Models.Quiz.create(req.body);
         res.json(quiz);
-    } catch (err) {
+    } catch (error) {
         err_500(res,error);
     }
 };
@@ -150,7 +150,7 @@ export const getQuizzesByCourse = async (req, res) => {
     try {
         const quizzes = await Models.Quiz.find({ course_id: req.params.courseId });
         res.json(quizzes);
-    } catch (err) {
+    } catch (error) {
         err_500(res,error);
     }
 };
@@ -160,7 +160,7 @@ export const getQuizById = async (req,res) =>{
         const {quizId} = req.params;
         const quiz = await Models.Quiz.findById(quizId);
         if(!quiz){
-            err_404(res);
+            return err_404(res);
         }
         res.json(quiz);
     }catch(error){
@@ -177,7 +177,7 @@ export const getQuizByDate = async (req,res) =>{
         }
         res.json(quiz);
     }catch(error){
-        err_500(req,error);
+        err_500(res,error);
     }
 };
 
@@ -268,7 +268,7 @@ export const getEventsByType = async (req, res) => {
         const { type } = req.params;     
         const { user_id } = req.query;   
 
-        const events = await Models.Event.find({
+        const events = await Models.Calendar_Event.find({
             type: type,
             user_id: user_id
         });
@@ -306,7 +306,7 @@ export const getStudySectionsByCourse = async (req, res) => {
     try {
         const { courseId } = req.params;
 
-        const studySections = await Models.StudySection.find({
+        const studySections = await Models.Study_Section.find({
             course_id: courseId
         });
 
@@ -342,8 +342,8 @@ export const getStudyNoteByUser = async (req, res) => {
     try {
         const { userId } = req.params;
 
-        const notes = await Models.StudyNote.find({
-            student_id: userId
+        const notes = await Models.Study_Note.find({
+            user_id: userId
         });
 
         if (!notes || notes.length === 0) {
@@ -440,7 +440,7 @@ export const getPerformanceStats = async (req, res) => {
 //holiday//
 export const getAllHolidays = async (req, res) => {
     try {
-        const holidays = await Holiday.find();
+        const holidays = await Models.Holiday.find();
         if (!holidays || holidays.length === 0) {
             return err_404(res);
         }

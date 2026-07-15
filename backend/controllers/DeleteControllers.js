@@ -7,7 +7,7 @@ async function deleteModel(Model, idParam, req, res){
         if(!deleted_entry){
             return res.status(404).json({error: `model not found`});
         }
-        res.json({success:true, message: `${Model.modeName} deleted`});
+        res.json({success:true, message: `${Model.modelName} deleted`});
     }catch(error){
         res.status(500).json({error: error.message});
     }

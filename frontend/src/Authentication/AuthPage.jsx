@@ -1,5 +1,5 @@
 import { Sparkles, Clock, FileText } from "lucide-react";
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 
 export default function AuthPage({
     authScreen,
@@ -12,19 +12,7 @@ export default function AuthPage({
     isGoogleLoading,
     googleButtonRef
 }) {
-    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const [user, setUser] = useState(null);
-    const [authError, setAuthError] = useState("");
-    const isGoogleConfigured = Boolean(googleClientId);
-    const displayUser =
-    user ??
-    {
-      name: "Guest Student",
-      email: isGoogleConfigured ? "Sign in to personalize StudyHub" : "Set VITE_GOOGLE_CLIENT_ID to enable Google login",
-    };
-    const avatarInitial = (displayUser.name?.[0] ?? "S").toUpperCase();
-
-    const isSignup = authScreen === "signup";  
+    const isSignup = authScreen === "signup";
 
 
     return (

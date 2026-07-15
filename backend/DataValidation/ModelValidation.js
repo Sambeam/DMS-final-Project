@@ -21,14 +21,14 @@ export const CourseSchema = z.object({
 export const CourseWorkSchema = z.object({
     course_id: z.string().min(1),
     cw_name: z.string().min(1),
-    cw_grade: z.number().min(1),
+    cw_grade: z.number().nullable().optional(),
     cw_weight: z.number().min(1)
 });
 
 export const QuizSchema = z.object({
     course_id: z.string().min(1),
     quiz_name: z.string().min(1),
-    date: z.date().optional(),
+    date: z.coerce.date().optional(),
     grade: z.number().nullable().optional()
 });
 
@@ -43,9 +43,9 @@ export const QuestionSchema = z.object({
 export const ResourceSchema = z.object({
     course_id: z.string().min(1),
     resource_name: z.string().min(1),
-    file_url: z.string().url(),
+    file_url: z.string().min(1),
     type: z.string().optional(),
-    upload_time: z.date().optional()
+    upload_time: z.coerce.date().optional()
 });
 
 export const CalendarEventSchema = z.object({
@@ -53,29 +53,29 @@ export const CalendarEventSchema = z.object({
     course_id: z.string().min(1).optional(),
     title: z.string().min(1),
     decsription: z.string().optional(),
-    start_time: z.date(),
-    end_time: z.date()
+    start_time: z.coerce.date(),
+    end_time: z.coerce.date()
 });
 
 export const StudySectionSchema = z.object({
     user_id: z.string().min(1),
     course_id: z.string().optional(),
-    start_time: z.date(),
-    end_time: z.date()
+    start_time: z.coerce.date(),
+    end_time: z.coerce.date()
 });
 
 export const StudyNoteSchema = z.object({
     user_id: z.string().min(1),
     course_id: z.string().optional(),
     title: z.string().min(1),
-    date: z.date()
+    date: z.coerce.date()
 });
 
 export const NotePageSchema = z.object({
     note_id: z.string().min(1),
     page: z.string().min(1),
     content: z.string().optional(),
-    date: z.date()
+    date: z.coerce.date()
 });
 
 export const EventTagSchema = z.object({
@@ -87,20 +87,20 @@ export const AIQuerySchema = z.object({
     user_id: z.string().min(1),
     content: z.string().min(1),
     response: z.string().optional(),
-    date: z.date()
+    date: z.coerce.date()
 });
 
 export const PerformanceStatSchema = z.object({
     user_id: z.string().min(1),
     metric_type: z.string().min(1),
     value: z.number().optional(),
-    record_time: z.date()
+    record_time: z.coerce.date()
 });
 
 export const HolidaySchema = z.object({
     country_code: z.string().min(1),
     year: z.number(),
-    date: z.date(),
+    date: z.coerce.date(),
     local_name: z.string().optional(),
     name: z.string().optional(),
     type: z.string().optional()

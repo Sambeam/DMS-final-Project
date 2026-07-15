@@ -1,13 +1,10 @@
 import React, {useEffect,useState} from "react";
-import { useParams } from "react-router-dom";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-import Dumpster from "../assets/trash_icon.png";
-import AddButton from "../assets/AddButton.png";
 import AssignmentView from "./course-layout-views/course-assignment-layout.jsx";
 import GradeView from "./course-layout-views/course-grade-layout.jsx";
 import QuizView from "./course-layout-views/course-quiz-layout.jsx";
@@ -19,14 +16,14 @@ function Banner({course}){
     return(
         <div className="relative w-full h-[35vh] bg-gray-100 rounded-xl shadow-md pb-10">
             <div className="absolute bottom-4 left-6 text-black text-left">
-            <p className="text-lg font-medium">{course.code}</p>
-            <p className="text-2xl font-bold">{course.name}</p>
+            <p className="text-lg font-medium">{course.course_code}</p>
+            <p className="text-2xl font-bold">{course.course_name}</p>
         </div>
     </div>
     );
 }
 
-function CustomTab({course}) {
+function CustomTab({course, assignments, onEditAssignment, onDeleteAssignment, onAddAssignmentForCourse}) {
   const [value, setValue] = useState("1");
 
   const handleChange = (event, newValue) => {
@@ -55,7 +52,13 @@ function CustomTab({course}) {
                 </TabList>
             </Box>
             <TabPanel value="1">
-                <AssignmentView course={course} />
+                <AssignmentView
+                    course={course}
+                    assignments={assignments}
+                    onEditAssignment={onEditAssignment}
+                    onDeleteAssignment={onDeleteAssignment}
+                    onAddAssignmentForCourse={onAddAssignmentForCourse}
+                />
             </TabPanel>
             <TabPanel value="2">
                 <GradeView course={course}/>
@@ -64,21 +67,26 @@ function CustomTab({course}) {
                 <QuizView course={course} />
             </TabPanel>
             <TabPanel value="4">
-                    <ResourceView />
+                    <ResourceView course={course} />
             </TabPanel>
         </TabContext>
     </div>
   );
 }
- 
-export default function CourseLayout({course}) {
+
+export default function CourseLayout({course, assignments, onEditAssignment, onDeleteAssignment, onAddAssignmentForCourse}) {
     if(!course) return <p>No course selected.</p>;
 
     return (
         <div>
             <Banner course={course} />
-            <CustomTab course={course}/>
+            <CustomTab
+                course={course}
+                assignments={assignments}
+                onEditAssignment={onEditAssignment}
+                onDeleteAssignment={onDeleteAssignment}
+                onAddAssignmentForCourse={onAddAssignmentForCourse}
+            />
         </div>
     )
 }
-
