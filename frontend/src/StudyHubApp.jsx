@@ -35,7 +35,33 @@ const StudyHubApp = () => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const USER_STORAGE_KEY = "studyhub_user";
   const [user, setUser] = useState(null);
+
+  // Persists login status across page reloads. Strips pswd_hash since the
+  // backend's login/signup responses include it and it must never sit in
+  // localStorage.
+  const applyUser = (nextUser) => {
+    setUser(nextUser);
+    if (typeof window === "undefined") return;
+    if (!nextUser) {
+      localStorage.removeItem(USER_STORAGE_KEY);
+      return;
+    }
+    const { pswd_hash, ...safeUser } = nextUser;
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(safeUser));
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem(USER_STORAGE_KEY);
+    if (!saved) return;
+    try {
+      setUser(JSON.parse(saved));
+    } catch {
+      localStorage.removeItem(USER_STORAGE_KEY);
+    }
+  }, []);
   const [authError, setAuthError] = useState("");
   const [googleReady, setGoogleReady] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -72,13 +98,13 @@ const StudyHubApp = () => {
           email: authForm.email,
           pswd_hash: authForm.password,
         });
-        setUser(response.data);
+        applyUser(response.data);
       } else {
         const response = await api.post("/user/login", {
           email: authForm.email,
           password: authForm.password,
         });
-        setUser(response.data);
+        applyUser(response.data);
       }
       setAuthForm({ name: "", email: "", password: "" });
       setAuthScreen("landing");
@@ -87,6 +113,7 @@ const StudyHubApp = () => {
     } finally {
       setAuthLoading(false);
     }
+    
   };
 
   const decodeCredential = (credential) => {
@@ -107,7 +134,7 @@ const StudyHubApp = () => {
       setAuthError("Unable to read Google profile. Please try again.");
       return;
     }
-    setUser({
+    applyUser({
       name: profile.name,
       email: profile.email,
       picture: profile.picture,
@@ -118,7 +145,7 @@ const StudyHubApp = () => {
   };
 
   const handleSignOut = () => {
-    setUser(null);
+    applyUser(null);
     setAuthError("");
     if (typeof window !== "undefined") {
       window.google?.accounts.id?.disableAutoSelect?.();
